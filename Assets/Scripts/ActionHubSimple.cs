@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class ActionHub : MonoBehaviour
+public class ActionHubSimple : MonoBehaviour
 {
     public InputAction Girar = new InputAction(type: InputActionType.Value);
     public InputAction Acelerar = new InputAction(type: InputActionType.Value);

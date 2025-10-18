@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class CarController : MonoBehaviour
 {
-    public ActionHub input;
+    public ActionHubSimple input;
     public float fuerzaMotor = 2500f;
     public float fuerzaFreno = 4000f;
     public float friccionLateral = 10f;
