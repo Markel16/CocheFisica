@@ -618,7 +618,7 @@ MonoBehaviour:
   Girar:
     m_Name: Girar
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType: Vector2
     m_Id: 7388e59a-699a-4e40-9909-727021d68071
     m_Processors: 
     m_Interactions: Press
@@ -627,7 +627,7 @@ MonoBehaviour:
   Acelerar:
     m_Name: Acelerar
     m_Type: 0
-    m_ExpectedControlType: 
+    m_ExpectedControlType: Vector2
     m_Id: eed0f7cc-6b36-44e8-a65c-dff39c8ba0aa
     m_Processors: 
     m_Interactions: Press
@@ -635,8 +635,8 @@ MonoBehaviour:
     m_Flags: 0
   Frenar:
     m_Name: Frenar
-    m_Type: 1
-    m_ExpectedControlType: 
+    m_Type: 0
+    m_ExpectedControlType: Vector2
     m_Id: 393bc7fd-d074-4683-ab3e-43d885263ecd
     m_Processors: 
     m_Interactions: Press
@@ -644,8 +644,8 @@ MonoBehaviour:
     m_Flags: 0
   FrenoMano:
     m_Name: Freno Mano
-    m_Type: 1
-    m_ExpectedControlType: 
+    m_Type: 0
+    m_ExpectedControlType: Vector2
     m_Id: 7223bccc-f58c-4ff4-a973-b6dc7b8bbab1
     m_Processors: 
     m_Interactions: Hold
@@ -653,7 +653,7 @@ MonoBehaviour:
     m_Flags: 0
   Reiniciar:
     m_Name: Reiniciar
-    m_Type: 1
+    m_Type: 0
     m_ExpectedControlType: 
     m_Id: fd509af5-37f3-4e1a-94e5-bc52e93bf622
     m_Processors: 

@@ -1,9 +1,16 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
 public class CarController : MonoBehaviour
 {
-    public ActionHubSimple input;
+    [Header("Acciones del asset (.inputactions)")]
+    public InputActionReference Move;       // Vector2 (2D Vector: W/S/A/D)
+    public InputActionReference Brake;      // Button (S)
+    public InputActionReference Handbrake;  // Button (Espacio)
+    public InputActionReference Reset;      // Button (R)
+
+    [Header("Físicas")]
     public float fuerzaMotor = 2500f;
     public float fuerzaFreno = 4000f;
     public float friccionLateral = 10f;
@@ -11,56 +18,67 @@ public class CarController : MonoBehaviour
     public float fuerzaGiro = 4f;
     public float arrastre = 0.5f;
 
-    private Rigidbody rb;
-    private Vector3 posInicial;
-    private Quaternion rotInicial;
+    Rigidbody rb;
+    Vector3 posIni; Quaternion rotIni;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-        posInicial = transform.position;
-        rotInicial = transform.rotation;
+        posIni = transform.position; rotIni = transform.rotation;
+    }
+
+    void OnEnable()
+    {
+        if (Move) Move.action.Enable();
+        if (Brake) Brake.action.Enable();
+        if (Handbrake) Handbrake.action.Enable();
+        if (Reset) Reset.action.Enable();
+    }
+
+    void OnDisable()
+    {
+        if (Move) Move.action.Disable();
+        if (Brake) Brake.action.Disable();
+        if (Handbrake) Handbrake.action.Disable();
+        if (Reset) Reset.action.Disable();
     }
 
     void FixedUpdate()
     {
-        if (input == null) return;
+        // Lectura segura (si no hay referencia, devuelve por defecto)
+        Vector2 move = Move ? Move.action.ReadValue<Vector2>() : Vector2.zero;
+        bool frenar = (Brake && Brake.action.IsPressed()) || move.y < 0f;
+        bool frenoMano = Handbrake && Handbrake.action.IsPressed();
+        if (Reset && Reset.action.WasPressedThisFrame()) Reiniciar();
 
-        float girar = input.Girar.ReadValue<float>();
-        float acelerar = input.Acelerar.ReadValue<float>();
-        bool frenar = input.Frenar.IsPressed();
-        bool frenoMano = input.FrenoMano.IsPressed();
-        if (input.Reiniciar.WasPressedThisFrame()) Reiniciar();
+        float girar = Mathf.Clamp(move.x, -1f, 1f);
+        float acelerar = Mathf.Max(0f, move.y);
 
-        Vector3 dirAdelante = transform.forward;
-        Vector3 dirDerecha = transform.right;
-        float velAdelante = Vector3.Dot(rb.linearVelocity, dirAdelante);
-        float velLateral = Vector3.Dot(rb.linearVelocity, dirDerecha);
+        Vector3 fwd = transform.forward;
+        Vector3 right = transform.right;
+        float vFwd = Vector3.Dot(rb.linearVelocity, fwd);
+        float vLat = Vector3.Dot(rb.linearVelocity, right);
 
-        // Tracci�n
         if (rb.linearVelocity.magnitude < velocidadMax)
-            rb.AddForce(dirAdelante * (acelerar * fuerzaMotor), ForceMode.Force);
+            rb.AddForce(fwd * (acelerar * fuerzaMotor), ForceMode.Force);
 
-        // Freno principal
         if (frenar)
-            rb.AddForce(-dirAdelante * Mathf.Sign(velAdelante) * fuerzaFreno, ForceMode.Force);
+            rb.AddForce(-fwd * Mathf.Sign(vFwd) * fuerzaFreno, ForceMode.Force);
 
-        // Fricci�n lateral y freno de mano
         float mult = frenoMano ? 3f : 1f;
-        rb.AddForce(-dirDerecha * velLateral * friccionLateral * mult, ForceMode.Force);
+        rb.AddForce(-right * vLat * friccionLateral * mult, ForceMode.Force);
 
-        // Arrastre del aire
         rb.AddForce(-rb.linearVelocity * arrastre, ForceMode.Force);
 
-        // Giro
-        rb.AddTorque(Vector3.up * girar * fuerzaGiro * velAdelante, ForceMode.Force);
+        rb.AddTorque(Vector3.up * girar * fuerzaGiro * Mathf.Abs(vFwd), ForceMode.Force);
     }
 
     void Reiniciar()
     {
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        transform.SetPositionAndRotation(posInicial, rotInicial);
+        transform.SetPositionAndRotation(posIni, rotIni);
     }
 }
+
